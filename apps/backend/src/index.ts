@@ -3,6 +3,9 @@ import mongoose, { Schema, Document } from "mongoose";
 import bodyParser from "body-parser";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { authenticator } from "otplib";
+import qrcode from "qrcode";
+import cors from "cors";
 
 // Connect to MongoDB
 mongoose.connect("mongodb://localhost:27017/password-manager");
@@ -10,6 +13,7 @@ mongoose.connect("mongodb://localhost:27017/password-manager");
 interface UserInterface extends Document {
   email: string;
   password: string;
+  twoFactorSecret: string;
   encryptedPasswords: {
     hostname: string;
     username: string;
@@ -25,6 +29,7 @@ interface Req extends Request {
 const UserSchema: Schema = new Schema({
   email: String,
   password: String,
+  twoFactorSecret: String,
   encryptedPasswords: [
     {
       hostname: String,
@@ -38,18 +43,49 @@ const User = mongoose.model<UserInterface>("User", UserSchema);
 
 // Set up Express and middleware
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
+
+// 2FA secret generation endpoing
+app.post("/api/register/generate-2fa", async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  // Validate user input
+  // ...
+
+  const twoFactorSecret = authenticator.generateSecret();
+  const otpauthURL = authenticator.keyuri(
+    email,
+    "PasswordManager",
+    twoFactorSecret
+  );
+
+  const qrCodeUrl = await qrcode.toDataURL(otpauthURL);
+
+  res.json({
+    message: "2FA secret generated successfully",
+    twoFactorSecret,
+    qrCodeUrl,
+  });
+});
 
 // User registration API endpoint
 app.post("/api/register", async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { email, password, twoFactorToken, twoFactorSecret } = req.body;
 
-  // Validate user input and handle 2FA setup
+  // Validate user input
   // ...
+
+  // Verify 2FA token
+  const isTokenValid = authenticator.check(twoFactorToken, twoFactorSecret);
+
+  if (!isTokenValid) {
+    return res.status(400).json({ message: "Invalid 2FA token" });
+  }
 
   // Hash the password and save user to the database
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = new User({ email, password: hashedPassword });
+  const user = new User({ email, password: hashedPassword, twoFactorSecret });
   await user.save();
 
   res.status(201).json({ message: "User registered successfully" });
@@ -57,7 +93,7 @@ app.post("/api/register", async (req: Request, res: Response) => {
 
 // User authentication API endpoint
 app.post("/api/login", async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { email, password, twoFactorToken } = req.body;
 
   // Find user and compare the password
   const user = await User.findOne({ email });
@@ -65,9 +101,16 @@ app.post("/api/login", async (req: Request, res: Response) => {
     return res.status(401).json({ message: "Invalid email or password" });
   }
 
-  // Verify 2FA and create a JWT
-  // ...
+  // Verify 2FA token
+  const isTokenValid = authenticator.check(
+    twoFactorToken,
+    user.twoFactorSecret
+  );
+  if (!isTokenValid) {
+    return res.status(401).json({ message: "Invalid 2FA token" });
+  }
 
+  // Create a JWT
   const token = jwt.sign({ userId: user._id }, "secret-key", {
     expiresIn: "1h",
   });
