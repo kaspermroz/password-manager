@@ -2,9 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App, { loader as appLoader } from "./pages/App";
+import Register, { loader as registerLoader } from "./pages/Register";
+import Login, { loader as loginLoader } from "./pages/Login";
 import "./index.css";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
 
 const router = createBrowserRouter([
   {
@@ -15,10 +15,12 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
+    loader: registerLoader,
   },
   {
     path: "/login",
     element: <Login />,
+    loader: loginLoader,
   },
 ]);
 

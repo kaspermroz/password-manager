@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { generateSecret, register } from "../api";
-import { Link } from "react-router-dom";
+import { Link, redirect, useNavigate } from "react-router-dom";
+import { setSession } from "../utils/session";
+
+export async function loader() {
+  const userToken = localStorage.getItem("userToken");
+  if (userToken) {
+    return redirect("/");
+  }
+
+  return null;
+}
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -8,6 +18,7 @@ export default function Register() {
   const [qr, setQr] = useState("");
   const [twoFactorSectet, setTwoFactorSecret] = useState("");
   const [otp, setOtp] = useState("");
+  const navigate = useNavigate();
 
   const secretGenerated = Boolean(qr && twoFactorSectet);
 
@@ -31,8 +42,9 @@ export default function Register() {
     e.preventDefault();
     const submit = async () => {
       const data = await register(email, password, otp, twoFactorSectet);
-      if (data.message) {
-        console.log(data.message);
+      if (data.token) {
+        setSession(data.token);
+        navigate("/");
       }
     };
 
@@ -77,9 +89,9 @@ export default function Register() {
           />
           <br />
           <button type="submit">Register </button>
-          <Link to="/register">Already have an account?</Link>
         </form>
       )}
+      <Link to="/login">Already have an account?</Link>
     </div>
   );
 }

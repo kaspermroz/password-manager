@@ -26,3 +26,17 @@ export async function register(
 
   return data;
 }
+
+export async function login(
+  email: string,
+  password: string,
+  twoFactorToken: string
+) {
+  const { data } = await api.post("/login", {
+    email,
+    password,
+    twoFactorToken,
+  });
+
+  return data;
+}

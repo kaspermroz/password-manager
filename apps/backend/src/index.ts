@@ -88,7 +88,12 @@ app.post("/api/register", async (req: Request, res: Response) => {
   const user = new User({ email, password: hashedPassword, twoFactorSecret });
   await user.save();
 
-  res.status(201).json({ message: "User registered successfully" });
+  // Create a JWT - login immediately
+  const token = jwt.sign({ userId: user._id }, "secret-key", {
+    expiresIn: "1h",
+  });
+
+  res.status(201).json({ token, message: "User registered successfully" });
 });
 
 // User authentication API endpoint
