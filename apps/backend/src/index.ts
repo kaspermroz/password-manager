@@ -219,6 +219,21 @@ app.delete(
   }
 );
 
+app.post("/api/validate-token", async (req: Request, res: Response) => {
+  const { token } = req.body;
+
+  try {
+    jwt.verify(token, "secret-key");
+    res.json({ message: "Token is valid" });
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      res.status(401).json({ message: "Token has expired" });
+    } else {
+      res.status(401).json({ message: "Invalid token" });
+    }
+  }
+});
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
