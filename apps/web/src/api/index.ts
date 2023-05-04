@@ -1,4 +1,5 @@
 import axios from "axios";
+import { encrypt } from "../utils/crypto";
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
@@ -39,4 +40,40 @@ export async function login(
   });
 
   return data;
+}
+
+export async function isTokenValid(token: string): Promise<boolean> {
+  const res = await api.post("/validate-token", { token });
+
+  return res.status === 200;
+}
+
+export async function getEncryptedPasswords(token: string) {
+  const { data } = await api.get("/passwords", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return data;
+}
+
+export async function storePassword(
+  hostname: string,
+  username: string,
+  password: string,
+  secret: string,
+  token: string
+) {
+  const encryptedPassword = encrypt(password, secret);
+
+  await api.post(
+    "/passwords",
+    { hostname, username, encryptedPassword },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 }
