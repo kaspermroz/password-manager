@@ -30,7 +30,6 @@ const router = createBrowserRouter([
   {
     path: "/delete-password",
     action: async ({ request }) => {
-      console.log("action called");
       const fd = await request.formData();
       const id = fd.get("id") as string;
       await deletePassword(id);

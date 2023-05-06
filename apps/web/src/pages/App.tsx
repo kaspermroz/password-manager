@@ -1,6 +1,7 @@
 import { redirect, useNavigate, useLoaderData, Form } from "react-router-dom";
 import { destroySession } from "../utils/session";
 import { getEncryptedPasswords, isTokenValid } from "../api";
+import { copyToClipboard, decrypt } from "../utils/passwords";
 
 type StoredPasswords = {
   _id: string;
@@ -38,8 +39,19 @@ function App() {
     navigate("/login");
   };
 
-  const deletePassword = (id: string) => {
-    console.log("delete", id);
+  const handleCopy = async (
+    encryptedPassword: string,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    const secret = prompt("Enter the secret used to encrypt password:");
+    if (secret) {
+      const password = decrypt(encryptedPassword, secret);
+      if (!password) {
+        alert("Invalid secret!");
+      }
+      e.currentTarget.focus();
+      await copyToClipboard(password);
+    }
   };
 
   return (
@@ -66,6 +78,9 @@ function App() {
             <h3>{password.hostname}</h3>
             <p>Username: {password.username}</p>
             <p>Encrypted Password: {password.encryptedPassword}</p>
+            <button onClick={(e) => handleCopy(password.encryptedPassword, e)}>
+              Copy to clipboard
+            </button>
             <Form method="post" action="/delete-password">
               <input type="hidden" name="id" value={password._id} />
               <button type="submit">Delete</button>

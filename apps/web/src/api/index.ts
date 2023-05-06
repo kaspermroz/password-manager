@@ -1,5 +1,5 @@
 import axios from "axios";
-import { encrypt } from "../utils/crypto";
+import { encrypt } from "../utils/passwords";
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
