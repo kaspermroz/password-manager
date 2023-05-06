@@ -1,7 +1,6 @@
-import { useState } from "react";
-import { redirect, useNavigate, useLoaderData } from "react-router-dom";
+import { redirect, useNavigate, useLoaderData, Form } from "react-router-dom";
 import { destroySession } from "../utils/session";
-import { getEncryptedPasswords, isTokenValid, storePassword } from "../api";
+import { getEncryptedPasswords, isTokenValid } from "../api";
 
 type StoredPasswords = {
   _id: string;
@@ -12,7 +11,6 @@ type StoredPasswords = {
 
 type LoaderData = {
   passwords: StoredPasswords[];
-  userToken: string;
 };
 
 export async function loader() {
@@ -28,24 +26,16 @@ export async function loader() {
 
   const passwords = await getEncryptedPasswords(userToken);
 
-  return { passwords, userToken };
+  return { passwords };
 }
 
 function App() {
-  const [hostname, setHostname] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [secret, setSecret] = useState("");
   const navigate = useNavigate();
-  const { passwords, userToken } = useLoaderData() as LoaderData;
+  const { passwords } = useLoaderData() as LoaderData;
 
   const handleLogout = () => {
     destroySession();
     navigate("/login");
-  };
-
-  const addPassword = () => {
-    storePassword(hostname, username, password, secret, userToken);
   };
 
   const deletePassword = (id: string) => {
@@ -57,33 +47,17 @@ function App() {
       <h1>Password Manager</h1>
       <div>
         <h2>Add new password</h2>
-        <input
-          value={hostname}
-          onChange={(e) => setHostname(e.target.value)}
-          placeholder="Hostname"
-        />
-        <br />
-        <input
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Username"
-        />
-        <br />
-        <input
-          value={password}
-          type="password"
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-        />
-        <br />
-        <input
-          value={secret}
-          type="password"
-          onChange={(e) => setSecret(e.target.value)}
-          placeholder="Secret"
-        />
-        <br />
-        <button onClick={addPassword}>Add Password</button>
+        <Form method="post" action="/store-password">
+          <input name="hostname" placeholder="Hostname" />
+          <br />
+          <input name="username" placeholder="Username" />
+          <br />
+          <input name="password" type="password" placeholder="Password" />
+          <br />
+          <input name="secret" type="password" placeholder="Secret" />
+          <br />
+          <button type="submit">Add Password</button>
+        </Form>
       </div>
       <div>
         <h2>Your Stored Passwords</h2>
@@ -92,7 +66,10 @@ function App() {
             <h3>{password.hostname}</h3>
             <p>Username: {password.username}</p>
             <p>Encrypted Password: {password.encryptedPassword}</p>
-            <button onClick={() => deletePassword(password._id)}>Delete</button>
+            <Form method="post" action="/delete-password">
+              <input type="hidden" name="id" value={password._id} />
+              <button type="submit">Delete</button>
+            </Form>
           </div>
         ))}
       </div>

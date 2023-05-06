@@ -43,7 +43,13 @@ export async function login(
 }
 
 export async function isTokenValid(token: string): Promise<boolean> {
-  const res = await api.post("/validate-token", { token });
+  let res;
+
+  try {
+    res = await api.post("/validate-token", { token });
+  } catch {
+    return false;
+  }
 
   return res.status === 200;
 }
@@ -62,9 +68,9 @@ export async function storePassword(
   hostname: string,
   username: string,
   password: string,
-  secret: string,
-  token: string
+  secret: string
 ) {
+  const token = localStorage.getItem("userToken") ?? "";
   const encryptedPassword = encrypt(password, secret);
 
   await api.post(
@@ -76,4 +82,15 @@ export async function storePassword(
       },
     }
   );
+}
+
+export async function deletePassword(id: string) {
+  const token = localStorage.getItem("userToken") ?? "";
+  const { data } = await api.delete(`/passwords/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return data;
 }
