@@ -12,6 +12,7 @@ import {
   Button,
   Grid,
   GridItem,
+  Text,
 } from "@chakra-ui/react";
 
 export async function loader() {
@@ -53,7 +54,9 @@ export default function Login() {
           {state === "credentials" && (
             <>
               <CardHeader>
-                <Heading>Login</Heading>
+                <Heading as="h2" size="lg">
+                  Login
+                </Heading>
               </CardHeader>
               <CardBody>
                 <Grid gap={4}>
@@ -101,10 +104,18 @@ export default function Login() {
           {state === "otp" && (
             <>
               <CardHeader>
-                <Heading>OTP Code</Heading>
+                <Heading as="h2" size="lg">
+                  2-Step Authentication
+                </Heading>
               </CardHeader>
               <CardBody>
                 <Grid gap={4}>
+                  <GridItem>
+                    <Text>
+                      Use the OTP code generator set up during registration to
+                      log in.
+                    </Text>
+                  </GridItem>
                   <GridItem>
                     <Input
                       type="otp"
