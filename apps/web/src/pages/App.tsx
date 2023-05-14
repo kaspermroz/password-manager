@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { redirect, useNavigate, useLoaderData, Form } from "react-router-dom";
 import { destroySession } from "../utils/session";
 import { getEncryptedPasswords, isTokenValid } from "../api";
@@ -31,6 +32,7 @@ export async function loader() {
 }
 
 function App() {
+  const [secret, setSecret] = useState("");
   const navigate = useNavigate();
   const { passwords } = useLoaderData() as LoaderData;
 

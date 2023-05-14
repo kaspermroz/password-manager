@@ -9,6 +9,7 @@ import App, { loader as appLoader } from "./pages/App";
 import Register, { loader as registerLoader } from "./pages/Register";
 import Login, { loader as loginLoader } from "./pages/Login";
 import { deletePassword, storePassword } from "./api";
+import { SecretProvider } from "./context/secret";
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -52,6 +53,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <SecretProvider>
+      <RouterProvider router={router} />
+    </SecretProvider>
   </React.StrictMode>
 );

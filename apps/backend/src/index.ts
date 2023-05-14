@@ -234,6 +234,27 @@ app.post("/api/validate-token", async (req: Request, res: Response) => {
   }
 });
 
+app.get(
+  "/api/passwords/:hostname",
+  isAuthenticated,
+  async (req: Request, res: Response) => {
+    const hostname = req.params.hostname;
+
+    // Fetch the user
+    const user = await User.findById((req as Req).userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Filter the user's passwords for the provided hostname
+    const passwordsForHostname = user.encryptedPasswords.filter(
+      (pw) => pw.hostname === hostname
+    );
+
+    res.json(passwordsForHostname);
+  }
+);
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
