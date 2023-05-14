@@ -5,6 +5,7 @@ import {
   RouterProvider,
   redirect,
 } from "react-router-dom";
+import { ChakraProvider } from "@chakra-ui/react";
 import App, { loader as appLoader } from "./pages/App";
 import Register, { loader as registerLoader } from "./pages/Register";
 import Login, { loader as loginLoader } from "./pages/Login";
@@ -54,7 +55,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <SecretProvider>
-      <RouterProvider router={router} />
+      <ChakraProvider>
+        <RouterProvider router={router} />
+      </ChakraProvider>
     </SecretProvider>
   </React.StrictMode>
 );

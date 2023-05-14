@@ -88,7 +88,7 @@ export default function Register() {
             onChange={(e) => setOtp(e.currentTarget.value)}
           />
           <br />
-          <button type="submit">Register </button>
+          <button type="submit">Register</button>
         </form>
       )}
       <Link to="/login">Already have an account?</Link>

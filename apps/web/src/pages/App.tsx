@@ -3,6 +3,7 @@ import { redirect, useNavigate, useLoaderData, Form } from "react-router-dom";
 import { destroySession } from "../utils/session";
 import { getEncryptedPasswords, isTokenValid } from "../api";
 import { copyToClipboard, decrypt } from "../utils/passwords";
+import Layout from "../components/Layout";
 
 type StoredPasswords = {
   _id: string;
@@ -57,7 +58,7 @@ function App() {
   };
 
   return (
-    <div>
+    <Layout>
       <h1>Password Manager</h1>
       <div>
         <h2>Add new password</h2>
@@ -91,7 +92,7 @@ function App() {
         ))}
       </div>
       <button onClick={handleLogout}>Logout</button>
-    </div>
+    </Layout>
   );
 }
 export default App;
