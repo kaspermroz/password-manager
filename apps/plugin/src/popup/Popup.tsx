@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'preact/hooks';
 import { login, isTokenValid, getEncryptedPasswords } from './api';
+import { decrypt } from './utils';
 
-type State = 'validating' | 'credentials' | 'otp' | 'authenticated';
+type State = 'validating' | 'credentials' | 'otp' | 'secret' | 'authenticated';
 
 const Popup = () => {
   const [state, setState] = useState<State>('validating');
@@ -9,6 +10,7 @@ const Popup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
+  const [secret, setSecret] = useState('');
 
   useEffect(() => {
     (async function () {
@@ -23,7 +25,7 @@ const Popup = () => {
                 });
               } else {
                 setUserToken(userToken);
-                setState('authenticated');
+                setState('secret');
               }
             } catch {
               chrome.storage.local.remove('userToken', () => {
@@ -51,11 +53,18 @@ const Popup = () => {
       chrome.storage.local.set({ userToken: token }, () => {
         console.log('token set');
         setUserToken(token);
-        setState('authenticated');
+        setState('secret');
       });
     } catch (err) {
       console.error(e);
     }
+  };
+
+  const handleSecret = (e: any) => {
+    e.preventDefault();
+
+    setSecret(e.currentTarget.secret.value);
+    setState('authenticated');
   };
 
   return (
@@ -99,7 +108,7 @@ const Popup = () => {
               value={otp}
               onChange={e => setOtp(e.currentTarget.value)}
             />
-            <button type='submit'>Sign innn</button>
+            <button type='submit'>Sign in</button>
             <a href='http://localhost:5173' target='_blank'>
               Don't have an account?
             </a>
@@ -107,14 +116,28 @@ const Popup = () => {
         </form>
       )}
 
-      {state === 'authenticated' && <Passwords token={userToken} />}
+      {state === 'secret' && (
+        <form method='post' onSubmit={handleSecret}>
+          <div class='grid gap-4 px-4'>
+            <p>
+              You must provide master password to get your stored passwords.
+            </p>
+            <input type='password' name='secret' placeholder='Secret' />
+            <button type='submit'>Store secret</button>
+          </div>
+        </form>
+      )}
+
+      {state === 'authenticated' && (
+        <Passwords token={userToken} secret={secret} />
+      )}
     </div>
   );
 };
 
-type PasswordsProps = { token: string };
+type PasswordsProps = { token: string; secret: string };
 
-const Passwords = ({ token }: PasswordsProps) => {
+const Passwords = ({ token, secret }: PasswordsProps) => {
   const [passwords, setPasswords] = useState<any>([]);
   useEffect(() => {
     chrome.tabs.query(
@@ -122,7 +145,7 @@ const Passwords = ({ token }: PasswordsProps) => {
       tabs => {
         console.log({ tabs });
         (async function () {
-          if (!token) return;
+          if (!token || !secret) return;
 
           const url = new URL(tabs[0].url!);
           const pwds = await getEncryptedPasswords(token, url.origin);
@@ -134,7 +157,6 @@ const Passwords = ({ token }: PasswordsProps) => {
   }, [token]);
 
   const handleAutofill = (username: string, password: string) => {
-    console.log({ username, password });
     chrome.tabs.query(
       { active: true, windowId: chrome.windows.WINDOW_ID_CURRENT },
       tabs => {
@@ -148,8 +170,6 @@ const Passwords = ({ token }: PasswordsProps) => {
               'input[type="password"]'
             );
 
-            console.log({ username, password });
-
             // @ts-expect-error
             if (usernameInput) usernameInput.value = username;
             // @ts-expect-error
@@ -161,7 +181,7 @@ const Passwords = ({ token }: PasswordsProps) => {
     );
   };
 
-  if (!token) return null;
+  if (!token || !secret) return null;
 
   return (
     <div class='grid gap-4 px-4'>
@@ -174,7 +194,10 @@ const Passwords = ({ token }: PasswordsProps) => {
               <td>
                 <button
                   onClick={() =>
-                    handleAutofill(p.username, p.encryptedPassword)
+                    handleAutofill(
+                      p.username,
+                      decrypt(p.encryptedPassword, secret)
+                    )
                   }
                 >
                   Autofill
