@@ -123,7 +123,7 @@ const Popup = () => {
               You must provide master password to get your stored passwords.
             </p>
             <input type='password' name='secret' placeholder='Secret' />
-            <button type='submit'>Store secret</button>
+            <button type='submit'>Get passwords</button>
           </div>
         </form>
       )}
