@@ -11,7 +11,6 @@ import Register, { loader as registerLoader } from "./pages/Register";
 import Login, { loader as loginLoader } from "./pages/Login";
 import { deletePassword, storePassword } from "./api";
 import { SecretProvider } from "./context/secret";
-import "./index.css";
 
 const router = createBrowserRouter([
   {

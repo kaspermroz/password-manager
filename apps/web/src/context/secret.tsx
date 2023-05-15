@@ -20,7 +20,7 @@ type Props = {
 };
 
 export function SecretProvider({ children }: Props) {
-  const [secret, setSecret] = useState("");
+  const [secret, setSecret] = useState("test"); // TODO change this to ""
 
   return (
     <SecretContext.Provider

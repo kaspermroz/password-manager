@@ -36,7 +36,6 @@ export async function copyToClipboard(decryptedPassword: string) {
         async () => await navigator.clipboard.writeText(decryptedPassword),
         500
       );
-      console.log("Password copied to clipboard");
     } catch (err) {
       console.error("Failed to copy password to clipboard:", err);
     }
