@@ -26,6 +26,8 @@ const manifest: ManifestType = {
       matches: [],
     },
   ],
+  permissions: ['storage', 'tabs', 'scripting', 'activeTab'],
+  host_permissions: ['http://localhost:3000'],
 };
 
 export default manifest;

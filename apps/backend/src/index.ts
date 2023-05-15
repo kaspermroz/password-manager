@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import { authenticator } from "otplib";
 import qrcode from "qrcode";
 import cors from "cors";
+import morgan from "morgan";
 
 // Connect to MongoDB
 mongoose.connect("mongodb://localhost:27017/password-manager");
@@ -45,6 +46,10 @@ const User = mongoose.model<UserInterface>("User", UserSchema);
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+morgan.token("body", (req: any, res) => JSON.stringify(req.body));
+
+app.use(morgan("[:date[clf]] :method :url :status :response-time ms - :body"));
 
 // 2FA secret generation endpoing
 app.post("/api/register/generate-2fa", async (req: Request, res: Response) => {
@@ -234,24 +239,22 @@ app.post("/api/validate-token", async (req: Request, res: Response) => {
   }
 });
 
-app.get(
-  "/api/passwords/:hostname",
+app.post(
+  "/api/passwords/hostname",
   isAuthenticated,
   async (req: Request, res: Response) => {
-    const hostname = req.params.hostname;
-
-    // Fetch the user
+    const { hostname } = req.body;
     const user = await User.findById((req as Req).userId);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User does not exist" });
+      return;
     }
 
-    // Filter the user's passwords for the provided hostname
-    const passwordsForHostname = user.encryptedPasswords.filter(
-      (pw) => pw.hostname === hostname
+    const passwords = user.encryptedPasswords.filter(
+      (password) => password.hostname === hostname
     );
 
-    res.json(passwordsForHostname);
+    res.json(passwords);
   }
 );
 
