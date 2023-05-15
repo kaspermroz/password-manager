@@ -33,6 +33,12 @@ export default function Login() {
   const [state, setState] = useState<PageState>("credentials");
   const navigate = useNavigate();
 
+  const handleContinue: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+
+    setState("otp");
+  };
+
   const handleLogin: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
 
@@ -50,94 +56,86 @@ export default function Login() {
   return (
     <Layout>
       <Card w={390} p={4}>
-        <form method="post" onSubmit={handleLogin}>
-          {state === "credentials" && (
-            <>
-              <CardHeader>
-                <Heading as="h2" size="lg">
-                  Login
-                </Heading>
-              </CardHeader>
-              <CardBody>
-                <Grid gap={4}>
-                  <GridItem>
-                    <Input
-                      type="email"
-                      name="email"
-                      placeholder="E-mail"
-                      value={email}
-                      onChange={(e) => setEmail(e.currentTarget.value)}
-                    />
-                  </GridItem>
-                  <GridItem>
-                    <Input
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.currentTarget.value)}
-                    />
-                  </GridItem>
-
-                  <GridItem>
-                    <Button
-                      colorScheme="teal"
-                      onClick={() => {
-                        if (!email || !password) {
-                          return;
-                        }
-                        setState("otp");
-                      }}
-                      disabled={!email || !password}
-                      w="full"
-                    >
-                      Continue
-                    </Button>
-                  </GridItem>
-                  <GridItem textAlign="center">
-                    <Link to="/register">Don&apos;t have an account?</Link>
-                  </GridItem>
-                </Grid>
-              </CardBody>
-            </>
-          )}
-          {state === "otp" && (
-            <>
-              <CardHeader>
-                <Heading as="h2" size="lg">
-                  2-Step Authentication
-                </Heading>
-              </CardHeader>
-              <CardBody>
-                <Grid gap={4}>
-                  <GridItem>
-                    <Text>
-                      Use the OTP code generator set up during registration to
-                      log in.
-                    </Text>
-                  </GridItem>
-                  <GridItem>
-                    <Input
-                      type="otp"
-                      name="otp"
-                      placeholder="OTP Code"
-                      value={otp}
-                      onChange={(e) => setOtp(e.currentTarget.value)}
-                    />
-                  </GridItem>
-                  <GridItem>
-                    <Button colorScheme="teal" type="submit" w="full">
-                      Sign in
-                    </Button>
-                  </GridItem>
-                  <GridItem textAlign="center">
-                    <Link to="/register">Don&apos;t have an account?</Link>
-                  </GridItem>
-                </Grid>
-              </CardBody>
-            </>
-          )}
-        </form>
+        {state === "credentials" && (
+          <form method="post" onSubmit={handleContinue}>
+            <CardHeader>
+              <Heading as="h2" size="lg">
+                Login
+              </Heading>
+            </CardHeader>
+            <CardBody>
+              <Grid gap={4}>
+                <GridItem>
+                  <Input
+                    type="email"
+                    name="email"
+                    placeholder="E-mail"
+                    value={email}
+                    onChange={(e) => setEmail(e.currentTarget.value)}
+                  />
+                </GridItem>
+                <GridItem>
+                  <Input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.currentTarget.value)}
+                  />
+                </GridItem>
+                <GridItem>
+                  <Button
+                    type="submit"
+                    colorScheme="teal"
+                    disabled={!email || !password}
+                    w="full"
+                  >
+                    Continue
+                  </Button>
+                </GridItem>
+                <GridItem textAlign="center">
+                  <Link to="/register">Don&apos;t have an account?</Link>
+                </GridItem>
+              </Grid>
+            </CardBody>
+          </form>
+        )}
+        {state === "otp" && (
+          <form method="post" onSubmit={handleLogin}>
+            <CardHeader>
+              <Heading as="h2" size="lg">
+                2-Step Authentication
+              </Heading>
+            </CardHeader>
+            <CardBody>
+              <Grid gap={4}>
+                <GridItem>
+                  <Text>
+                    Use the OTP code generator set up during registration to log
+                    in.
+                  </Text>
+                </GridItem>
+                <GridItem>
+                  <Input
+                    type="otp"
+                    name="otp"
+                    placeholder="OTP Code"
+                    value={otp}
+                    onChange={(e) => setOtp(e.currentTarget.value)}
+                  />
+                </GridItem>
+                <GridItem>
+                  <Button colorScheme="teal" type="submit" w="full">
+                    Sign in
+                  </Button>
+                </GridItem>
+                <GridItem textAlign="center">
+                  <Link to="/register">Don&apos;t have an account?</Link>
+                </GridItem>
+              </Grid>
+            </CardBody>
+          </form>
+        )}
       </Card>
     </Layout>
   );
