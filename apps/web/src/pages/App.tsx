@@ -159,7 +159,7 @@ function App() {
                       <FormLabel>Host name</FormLabel>
                       <Input
                         name="hostname"
-                        placeholder="https://facebook.com"
+                        placeholder="https://www.facebook.com"
                         ref={initialRef}
                       />
                     </FormControl>
