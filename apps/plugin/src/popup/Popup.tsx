@@ -149,7 +149,6 @@ const Passwords = ({ token, secret }: PasswordsProps) => {
 
           const url = new URL(tabs[0].url!);
           const pwds = await getEncryptedPasswords(token, url.origin);
-          console.log(pwds);
           setPasswords(pwds);
         })();
       }
@@ -186,27 +185,20 @@ const Passwords = ({ token, secret }: PasswordsProps) => {
   return (
     <div class='grid gap-4 px-4'>
       <p>You have {passwords.length} passwords for this origin.</p>
-      <table>
-        <tbody>
-          {passwords.map((p: any) => (
-            <tr>
-              <td>{p.username}</td>
-              <td>
-                <button
-                  onClick={() =>
-                    handleAutofill(
-                      p.username,
-                      decrypt(p.encryptedPassword, secret)
-                    )
-                  }
-                >
-                  Autofill
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+      {passwords.map((p: any) => (
+        <div class='password-row'>
+          <span class='text-sm'>{p.username}</span>
+          <button
+            class='button-sm text-sm'
+            onClick={() =>
+              handleAutofill(p.username, decrypt(p.encryptedPassword, secret))
+            }
+          >
+            Autofill
+          </button>
+        </div>
+      ))}
     </div>
   );
 };
