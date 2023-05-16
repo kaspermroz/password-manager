@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+input {
+  background: #ffffff;
+  padding: 4px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+}
+
+button {
+  padding: 4px 16px;
+  color: white;
+  background-color: #319795 !important;
+  border-radius: 6px;
+}
+
+.button-sm {
+  padding: 2px 16px;
+}
+
+.password-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
