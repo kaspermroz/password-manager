@@ -47,7 +47,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-morgan.token("body", (req: any, res) => JSON.stringify(req.body));
+morgan.token("body", (req: Request) => JSON.stringify(req.body));
 
 app.use(morgan("[:date[clf]] :method :url :status :response-time ms - :body"));
 
