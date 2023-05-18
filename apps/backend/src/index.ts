@@ -8,9 +8,6 @@ import qrcode from "qrcode";
 import cors from "cors";
 import morgan from "morgan";
 
-// Connect to MongoDB
-mongoose.connect("mongodb://localhost:27017/password-manager");
-
 interface UserInterface extends Document {
   email: string;
   password: string;
@@ -25,6 +22,9 @@ interface UserInterface extends Document {
 interface Req extends Request {
   userId: string;
 }
+
+// Connect to MongoDB
+mongoose.connect("mongodb://localhost:27017/password-manager");
 
 // Define User model
 const UserSchema: Schema = new Schema({
