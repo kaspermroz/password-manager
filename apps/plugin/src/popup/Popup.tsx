@@ -164,14 +164,13 @@ const Passwords = ({ token, secret }: PasswordsProps) => {
             tabId: tabs[0]!.id!,
           },
           func: function (username, password) {
-            var usernameInput = document.querySelector('input[type="text"]');
+            var usernameInput = document.querySelector(
+              'input[type="text"]'
+            ) as HTMLInputElement;
             var passwordInput = document.querySelector(
               'input[type="password"]'
-            );
-
-            // @ts-expect-error
+            ) as HTMLInputElement;
             if (usernameInput) usernameInput.value = username;
-            // @ts-expect-error
             if (passwordInput) passwordInput.value = password;
           },
           args: [username, password],
@@ -179,6 +178,8 @@ const Passwords = ({ token, secret }: PasswordsProps) => {
       }
     );
   };
+
+  
 
   if (!token || !secret) return null;
 
