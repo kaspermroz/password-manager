@@ -26,7 +26,7 @@ interface Req extends Request {
 // Connect to MongoDB
 mongoose.connect("mongodb://localhost:27017/password-manager");
 
-// Define User model
+// Define User schema
 const UserSchema: Schema = new Schema({
   email: String,
   password: String,
@@ -40,6 +40,7 @@ const UserSchema: Schema = new Schema({
   ],
 });
 
+// Create user model
 const User = mongoose.model<UserInterface>("User", UserSchema);
 
 // Set up Express and middleware
